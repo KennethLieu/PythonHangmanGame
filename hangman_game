@@ -1,0 +1,169 @@
+class HangmanPlayer:
+    def __init__(self,name,score,playerID):
+        self.name = name
+        self.score = score
+        self.playerID = playerID
+    def updateScore(self,newScore):
+        self.score = newScore
+class Hangman:
+    def __init__(self):
+        self.numberOfGuesses = 0
+        self.actual = ''
+        self.guessed = []
+        self.guess = ''
+        self.revealed = ''
+        self.numberOfUnrev = 0
+    def determinePlayer1Score(self,unrevealed):
+        return unrevealed + 1
+    def determinePlayer2Score(self,multiplier):
+        return (self.numberOfGuesses + 1) * multiplier
+    def playAgain(self,dec1,dec2):
+        return dec1 == dec2 and dec1 == 'yes'
+    def setGuessed(self,actualW):
+        guess = ''
+        for x in actualW:
+            guess += '-'
+        self.revealed = guess
+        self.actual = actualW
+        return guess
+    def setGuesses(self):
+        alreadyUsed = []
+        count = 0
+        for x in self.actual:
+            if x in alreadyUsed:
+                count += 1
+            else:
+                alreadyUsed.append(x)
+        self.numberOfGuesses = len(alreadyUsed)
+        if count // 3 == 0:
+            self.numberOfGuesses += 1
+        else:
+            self.numberOfGuesses += (count//3)
+        return self.numberOfGuesses
+    def guessing(self,guess):
+        if guess in self.actual:
+            ind = 0
+            while ind < len(self.actual):
+                if self.actual[ind] == guess:
+                    a = self.revealed[:ind]
+                    c = self.revealed[ind+1:]
+                    self.revealed = a + guess + c
+                    self.numberOfUnrev -= 1
+                ind += 1
+        else:
+            print('Character ',guess,' is not in the word! Try again!')
+        self.numberOfGuesses -= 1
+    def player1Victory(self):
+        return self.numberOfGuesses == 0 and self.revealed != self.actual
+    def player2Victory(self):
+        return self.revealed == self.actual
+class HangmanPlayerList:
+    def __init__(self):
+        self.hangmanPlayerList = []
+    def addToList(self,player):
+        self.hangmanPlayerList.append(player)
+def hangmanGame():
+    list1 = HangmanPlayerList()
+    name1 = input("Player X, enter your name: ")
+    name2 = input("Player Y, enter your name: ")
+    round = 1
+    while True:
+        print("Round:",round)
+        gamed = Hangman()
+        id1 = int(input(name1 + ", enter whether you wish to be player 1 or player 2: "))
+        if round == 1:
+            player1 = HangmanPlayer(name1,0,id1)
+            if id1 == 1:
+                player2 = HangmanPlayer(name2,0,2)
+            else:
+                player2 = HangmanPlayer(name2,0,1)
+            list1.addToList(player1)
+            list1.addToList(player2)
+        else:
+            index = 0
+            while index < len(list1.hangmanPlayerList):
+                if list1.hangmanPlayerList[index].name == name1:
+                    player1 = HangmanPlayer(name1,list1.hangmanPlayerList[index].score,id1)
+                    list1.hangmanPlayerList[index] = player1
+                    if id1 == 1:
+                        index1 = 0
+                        while index1 < len(list1.hangmanPlayerList):
+                            if list1.hangmanPlayerList[index1].name == name2:
+                                list1.hangmanPlayerList[index1] = HangmanPlayer(name2,list1.hangmanPlayerList[index1].score,2)
+                                break
+                            index1 += 1
+                    else:
+                        index1 = 0
+                        while index1 < len(list1.hangmanPlayerList):
+                            if list1.hangmanPlayerList[index1].name == name2:
+                                list1.hangmanPlayerList[index1] = HangmanPlayer(name2,list1.hangmanPlayerList[index1].score,1)
+                                break
+                            index1 += 1
+                    break
+                index += 1
+        actualWord = ''
+        for x in list1.hangmanPlayerList:
+            if x.playerID == 1:
+                actualWord = input(x.name + ", enter a word for the other player to guess: ")
+                break
+        attempt = gamed.setGuessed(actualWord)
+        numberOfGuesses = gamed.setGuesses()
+        while True:
+            print('Number of guesses: ',gamed.numberOfGuesses)
+            print('Revealed: ',gamed.revealed)
+            print('Guessed: ',gamed.guessed)
+            attempted = input('Enter a letter in the word: ')
+            gamed.guessing(attempted)
+            if gamed.player1Victory() == True or gamed.player2Victory() == True:
+                break
+        if gamed.player1Victory() == True:
+            index = 0
+            while index < len(list1):
+                if list1.hangmanPlayerList[index].playerID == 1:
+                    print(list1.hangmanPlayerList[index].name + ' was victorious in round ' + round + '!')
+                    print('Victory point: 1')
+                    print('Number of unrevealed characters: ',gamed.numberOfUnrev)
+                    list1.hangmanPlayerList[index].updateScore(list1.hangmanPlayerList[index].score + gamed.determinePlayer1Score(2,gamed.numberOfUnrev))
+                    print('Total points for ',list1.hangmanPlayerList[index].name,': ',list1.hangmanPlayerList[index].score)
+                    index1 = 0
+                    while index1 < len(list1.hangmanPlayerList):
+                        if list1.hangmanPlayerList[index1].playerID == 2:
+                            print('Total points for ',list1.hangmanPlayerList[index1].name,': ',list1.hangmanPlayerList[index1].score)
+                            break
+                        index1 += 1
+                    break
+                index += 1
+        else:
+            index = 0
+            while index < len(list1.hangmanPlayerList):
+                if list1.hangmanPlayerList[index].playerID == 2:
+                    print(list1.hangmanPlayerList[index].name,' was victorious in round ',round,'!')
+                    print('Victory point: 1')
+                    print('Number of guesses remaining: ',gamed.numberOfGuesses)
+                    list1.hangmanPlayerList[index].updateScore(list1.hangmanPlayerList[index].score + gamed.determinePlayer2Score(gamed.numberOfGuesses))
+                    print('Total points for ',list1.hangmanPlayerList[index].name,': ',list1.hangmanPlayerList[index].score)
+                    index1 = 0
+                    while index1 < len(list1.hangmanPlayerList):
+                        if list1.hangmanPlayerList[index1].playerID == 1:
+                            print('Total points for ',list1.hangmanPlayerList[index1].name,': ',list1.hangmanPlayerList[index1].score)
+                            break
+                        index1 += 1
+                    break
+                index += 1
+        decision1 = input(list1.hangmanPlayerList[0].name+', do you wish to play again? ')
+        decision2 = input(list1.hangmanPlayerList[1].name+', do you wish to play again? ')
+        if gamed.playAgain(decision1, decision2) == False:
+            break
+        round += 1
+    greater = -1
+    ind = 0
+    for x in list1.hangmanPlayerList:
+        if x.score > greater:
+            greater = x.score
+    if list1.hangmanPlayerList[0].score == list1.hangmanPlayerList[1].score:
+        print('Tied game! Winner will be chosen at random: (0 = ',hangmanPlayerList[0].name,)
+    while ind < len(list1.hangmanPlayerList):
+        if greater == list1.hangmanPlayerList[ind].score:
+            print(list1.hangmanPlayerList[ind].name,'is the winner of the game session, with a score of:',list1.hangmanPlayerList[ind].score)
+        ind += 1
+hangmanGame()
