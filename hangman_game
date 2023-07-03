@@ -1,3 +1,4 @@
+import random
 class HangmanPlayer:
     def __init__(self,name,score,playerID):
         self.name = name
@@ -79,7 +80,7 @@ def hangmanGame():
     while True:
         print("Round:",round)
         gamed = Hangman()
-        id1 = int(input(name1 + ", enter whether you wish to be player 1 or player 2: "))
+        id1 = int(input(name1 + ", enter whether you wish to be player 1 or 2: "))
         if round == 1:
             player1 = HangmanPlayer(name1,0,id1)
             if id1 == 1:
@@ -120,6 +121,7 @@ def hangmanGame():
                 else:
                     y = 0
                 actualWord = input(x.name + ", enter a word for "+ list1.hangmanPlayerList[y].name +" to guess: ")
+                print("\n\n\n\n\n\n\n\n\n\n\n\n")
                 break
             tot += 1
         attempt = gamed.setGuessed(actualWord)
@@ -137,10 +139,10 @@ def hangmanGame():
             index = 0
             while index < len(list1.hangmanPlayerList):
                 if list1.hangmanPlayerList[index].playerID == 1:
-                    print(list1.hangmanPlayerList[index].name + ' was victorious in round ' + str(round) + '!')
+                    print(list1.hangmanPlayerList[index].name + 'was victorious in round ' + str(round) + '!')
                     print('Victory point: 1')
                     print('Number of unrevealed characters: ',gamed.numberOfUnrev)
-                    list1.hangmanPlayerList[index].updateScore(list1.hangmanPlayerList[index].score + gamed.determinePlayer1Score(2,gamed.numberOfUnrev))
+                    list1.hangmanPlayerList[index].updateScore(list1.hangmanPlayerList[index].score + gamed.determinePlayer1Score(gamed.numberOfUnrev))
                     print('Total points for ',list1.hangmanPlayerList[index].name,': ',list1.hangmanPlayerList[index].score)
                     index1 = 0
                     while index1 < len(list1.hangmanPlayerList):
@@ -178,9 +180,12 @@ def hangmanGame():
         if x.score > greater:
             greater = x.score
     if list1.hangmanPlayerList[0].score == list1.hangmanPlayerList[1].score:
-        print('Tied game! Winner will be chosen at random: (0 = ',hangmanPlayerList[0].name,)
-    while ind < len(list1.hangmanPlayerList):
-        if greater == list1.hangmanPlayerList[ind].score:
-            print(list1.hangmanPlayerList[ind].name,'is the winner of the game session, with a score of:',list1.hangmanPlayerList[ind].score)
-        ind += 1
+        print('Tied game! Winner will be chosen at random: ')
+        randomNum = random.randint(0,1)
+        print(list1.hangmanPlayerList[randomNum].name,'wins the tiebreaker, with a score of:',list1.hangmanPlayerList[randomNum].score)
+    else:
+        while ind < len(list1.hangmanPlayerList):
+            if greater == list1.hangmanPlayerList[ind].score:
+                print(list1.hangmanPlayerList[ind].name,'is the winner of the game session, with a score of:',list1.hangmanPlayerList[ind].score)
+            ind += 1
 hangmanGame()
