@@ -16,8 +16,8 @@ class Hangman:
         self.numberOfUnrev = 0
     def determinePlayer1Score(self,unrevealed):
         return unrevealed + 1
-    def determinePlayer2Score(self,multiplier):
-        return (self.numberOfGuesses + 1) * multiplier
+    def determinePlayer2Score(self,guesses):
+        return guesses+1
     def playAgain(self,dec1,dec2):
         return dec1 == dec2 and dec1 == 'yes'
     def setGuessed(self,actualW):
